@@ -11,15 +11,30 @@ void	update_label()
 	struct dirent *sdir2;
 	DIR *dir;
 	DIR *dir2;
-	char	uword[20];
+	unsigned char	uword[20];
+	unsigned char	updatedw[20];
 	int	ytm_control;
 	int len;
+	char	*doc;
+	int j = 0;
 
 	ytm_control = 0;
 	len = 0;
 	printf("Güncellenecek etiketi giriniz: \n");
 	fflush(stdin);
 	scanf("%[^\n]s", uword);
+	printf("%s\n",(unsigned char *)uword); // ------------------------------------> :D
+	printf("Güncellemek istediğiniz kelimeyi giriniz: \n");
+	fflush(stdin);
+	scanf("%[^\n]s", updatedw);
+	printf("%s\n",(unsigned char *)updatedw); // ------------------------------------> :D
+	// while (uword[j])
+	// {
+	// 	printf("%s",(unsigned char *)uword);
+	// 	//write(1, &uword[j], 1);
+	// 	j++;
+	// }
+
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
 		(write(1, "Error\n", 6));
 	//else
@@ -40,7 +55,7 @@ void	update_label()
 			if (!strcmp(sdir2->d_name, ".") || !strcmp(sdir2->d_name, "..") || !find_txt(sdir2->d_name))
 				continue;
 			chdir(strcat(cwd, "/"));
-			fd = open(sdir2->d_name, O_RDONLY);
+			fd = open(sdir2->d_name, O_RDWR);
 			//printf("Dosya: %s\n", sdir2->d_name);
 			i = 1;
 			while ((row = get_next_line(fd)) != NULL)
@@ -49,10 +64,15 @@ void	update_label()
 				{
 					ytm_control++;
 				}
-				if (wordcmp(uword, row, sdir2->d_name) == 2)
+				if (uwordcmp(uword, row, sdir2->d_name, fd) == 2)
 				{
 					printf("Aha buldum \n%s isimli dosyada %d satırda aradığınız etiket bulunmakta\n", sdir2->d_name, i);
-					printf("file: %s length : %d\n",sdir2->d_name,file_lenght(fd, &len, row));
+					close(fd);
+					fd = open(sdir2->d_name, O_RDWR);
+					row = get_next_line(fd);
+					printf("row: %s\n", row);
+					printf("file: \n%s doc : \n%s\n",sdir2->d_name, "zort");
+					update_doc(ft_strjoin(row,readtxt(fd)),fd, uword, updatedw);
 					//usleep(2000000);
 				}
 				else if (wordcmp(uword, row, sdir2->d_name) == 3)
